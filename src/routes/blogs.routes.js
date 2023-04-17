@@ -6,9 +6,18 @@ const Blogs = require("../controllers/blogs.controller");
 const bodyValidator = require("../middlewares/bodyValidator");
 const blogSchema = require("../validators/BlogSchema");
 
+// upload files
+const { uploadFiles } = require("../middlewares/multerStorage");
+const cloudinaryUpload = require("../middlewares/cloudinaryUpload");
+
 router
   .route("/")
   .get(Blogs.getBlogs)
-  .post(bodyValidator(blogSchema), Blogs.postBlog);
+  .post(
+    uploadFiles,
+    cloudinaryUpload,
+    bodyValidator(blogSchema),
+    Blogs.postBlog
+  );
 
 module.exports = router;

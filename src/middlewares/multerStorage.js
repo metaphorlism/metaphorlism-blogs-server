@@ -2,7 +2,11 @@ const multer = require("multer");
 
 const storage = multer.memoryStorage({
   filename: (req, file, cb) => {
-    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+    if (
+      file.mimetype === "image/jpeg" ||
+      file.mimetype === "image/png" ||
+      file.mimetype === "text/plain"
+    ) {
       cb(null, file.originalname);
     } else {
       throw new Error("Only JPEG and PNG are allowed");
@@ -10,25 +14,9 @@ const storage = multer.memoryStorage({
   },
 });
 
-const upload = multer({ storage: storage }).single("image");
-
-const cvStorage = multer.memoryStorage({
-  filename: (req, file, cb) => {
-    if (
-      file.mimetype === "application/pdf" ||
-      file.mimetype === "application/msword"
-    ) {
-      cb(null, file.originalname);
-    } else {
-      throw new Error("Only PDF and DOC file are allowed");
-    }
-  },
-});
-
-const uploadCV = multer({ storage: cvStorage }).single("CV");
+const upload = multer({ storage: storage }).array("files", 2);
 
 module.exports = {
   storage: storage,
-  upload: upload,
-  uploadCV: uploadCV,
+  uploadFiles: upload,
 };

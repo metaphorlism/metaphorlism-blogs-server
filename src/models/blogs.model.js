@@ -3,16 +3,9 @@ const mongoose = require("mongoose");
 const { hostSchema } = require("./hosts.model");
 
 const blogSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, "Blog title is required"],
-  },
   image: {
     type: String,
     required: [true, "Blog image is required"],
-  },
-  description: {
-    type: String,
   },
   blog_url: {
     type: String,

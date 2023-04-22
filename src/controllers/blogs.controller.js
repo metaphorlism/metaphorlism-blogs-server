@@ -3,59 +3,19 @@ const ApiFeatures = require("../utils/ApiFeatures");
 const buildUrl = require("../utils/BuildUrl");
 const Serializer = require("../utils/Serializer");
 
+const mongoose = require("mongoose");
+const { NotFoundError, BadRequestError } = require("../utils/ErrorMessages");
+
+const BlogServices = require("../services/blogServices");
+
 class Blogs {
   async getBlogs(req, res) {
-    const blogs = new ApiFeatures(BlogsModel, req.query)
-      .filter(["host", "category"])
-      .sort()
-      .limitFields()
-      .paginate();
-
-    let docs = await blogs.model.populate("host").exec();
-    const blogCount = await BlogsModel.countDocuments();
-    const queryOptions = await blogs.model.options;
-
-    // get limit per page
-    const limitPerPage = queryOptions.limit;
-
-    // get current page
-    const page = queryOptions.skip / limitPerPage + 1;
-
-    // current url
-    const currentUrl = new URL(
-      req.protocol + "://" + req.get("host") + req.originalUrl
-    );
-
-    //next page
-    const hasNextPage =
-      limitPerPage * page < blogCount
-        ? buildUrl(currentUrl, { "page[offset]": page + 1 })
-        : null;
-
-    //previous page
-    const hasPreviousPage =
-      queryOptions.skip / limitPerPage + 1 > 1
-        ? buildUrl(currentUrl, { "page[offset]": page - 1 })
-        : null;
-
-    // last page
-    const hasLastPage = buildUrl(currentUrl, {
-      "page[offset]": blogCount / limitPerPage,
-    });
-
-    const links = {
-      self: currentUrl,
-      next: hasNextPage,
-      previous: hasPreviousPage,
-      last: hasLastPage,
-    };
-
-    docs = Serializer.blog(docs, links);
+    const blogs = await BlogServices.getBlogs(req);
 
     res.status(200).json({
       status: "Success",
-      result: docs.data.length,
-      blogs: docs,
+      result: blogs.data.length,
+      blogs,
     });
   }
 
@@ -66,6 +26,33 @@ class Blogs {
       status: "Success",
       message: "Uploaded Successfully !",
       blog,
+    });
+  }
+
+  async editBlog(req, res) {
+    const id = req.params.id;
+
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestError(`${id} is not a valid id`);
+    }
+
+    const updatedBlog = await BlogsModel.findByIdAndUpdate(
+      id,
+      { ...req.body, update_date: Date.now() },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedBlog) {
+      throw new NotFoundError(`Blog ${id} is not found`);
+    }
+
+    res.status(200).json({
+      status: "Success",
+      message: "Updated Successfully",
+      blog: updatedBlog,
     });
   }
 }

@@ -20,4 +20,8 @@ router
     Blogs.postBlog
   );
 
+router
+  .route("/:id")
+  .put(uploadFiles, bodyValidator(blogSchema), Blogs.editBlog);
+
 module.exports = router;

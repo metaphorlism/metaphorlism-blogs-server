@@ -3,9 +3,10 @@ const multer = require("multer");
 const storage = multer.memoryStorage({
   filename: (req, file, cb) => {
     if (
-      file.mimetype === "image/jpeg" ||
-      file.mimetype === "image/png" ||
-      file.mimetype === "text/plain"
+      file &&
+      (file.mimetype === "image/jpeg" ||
+        file.mimetype === "image/png" ||
+        file.mimetype === "text/plain")
     ) {
       cb(null, file.originalname);
     } else {

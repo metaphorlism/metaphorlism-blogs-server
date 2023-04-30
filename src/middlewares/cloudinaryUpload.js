@@ -1,6 +1,5 @@
 const sharp = require("sharp");
 const { CLOUDINARY } = require("../configs");
-const { v4: uuidv4 } = require("uuid");
 const generateRandomId = require("../utils/GenerateRandomId");
 
 const cloudinaryUpload = async (req, res, next) => {

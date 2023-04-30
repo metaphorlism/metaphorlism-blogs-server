@@ -1,15 +1,10 @@
 const sharp = require("sharp");
 const { CLOUDINARY } = require("../configs");
 const { v4: uuidv4 } = require("uuid");
+const generateRandomId = require("../utils/GenerateRandomId");
 
 const cloudinaryUpload = async (req, res, next) => {
-  if (req.files) {
-    const files = req.files;
-
-    if (files.length !== 2) {
-      return next(new Error("You can upload only two files at once!"));
-    }
-
+  if (req.files.length > 0 && req.files.length <= 2) {
     try {
       const uploadPromises = req.files.map((file) => {
         //image
@@ -39,7 +34,7 @@ const cloudinaryUpload = async (req, res, next) => {
           // markdown
         } else if (file.mimetype === "text/markdown") {
           //generate uuid for public_id
-          const uuid = uuidv4();
+          const publicId = generateRandomId(20);
 
           return new Promise((resolve, reject) => {
             CLOUDINARY.uploader
@@ -47,7 +42,7 @@ const cloudinaryUpload = async (req, res, next) => {
                 {
                   resource_type: "auto",
                   folder: "blog_markdowns",
-                  public_id: `${uuid}.md`,
+                  public_id: `${publicId}.md`,
                 },
                 (error, result) => {
                   if (error) {

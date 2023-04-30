@@ -9,6 +9,7 @@ const blogSchema = require("../validators/BlogSchema");
 // upload files
 const { uploadFiles } = require("../middlewares/multerStorage");
 const cloudinaryUpload = require("../middlewares/cloudinaryUpload");
+const cloudinaryDestroy = require("../middlewares/cloudinaryDestroy");
 
 router
   .route("/")
@@ -22,6 +23,12 @@ router
 
 router
   .route("/:id")
-  .put(uploadFiles, bodyValidator(blogSchema), Blogs.editBlog);
+  .put(
+    uploadFiles,
+    cloudinaryUpload,
+    cloudinaryDestroy,
+    bodyValidator(blogSchema),
+    Blogs.editBlog
+  );
 
 module.exports = router;

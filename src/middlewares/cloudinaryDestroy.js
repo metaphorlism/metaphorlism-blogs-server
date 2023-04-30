@@ -1,20 +1,58 @@
-// const { CLOUDINARY } = require('../config')
-// const { FetchDataById } = require('../helper/DataFetching')
-// const UserModel = require('../models/users.model')
+const { CLOUDINARY } = require("../configs");
+const BlogModel = require("../models/blogs.model");
 
-// const cloudinaryDestroy = async (req, res, next) => {
-//   //   const data = await UserModel.findById(req.params.id)
-//   const data = await FetchDataById(UserModel, req.params.id)
+const cloudinaryDestroy = async (req, res, next) => {
+  const { blog_url, image } = await BlogModel.findById(req.params.id);
+  const promises = [];
 
-//   const public_id = data.image
-//     .split('/')
-//     [data.image.split('/').length - 1].split('.')[0]
-//   console.log(public_id)
+  if (req.files.length > 0 && req.files.length <= 2) {
+    if (blog_url !== req.body.blog_url) {
+      const blog_id = blog_url
+        .split("/")
+        [blog_url.split("/").length - 1].split(".")[0];
+      promises.push(
+        new Promise((resolve, reject) => {
+          CLOUDINARY.uploader.destroy(
+            "blog_markdowns/" + blog_id + ".md",
+            { resource_type: "raw" },
+            (error, result) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(result);
+              }
+            }
+          );
+        })
+      );
+    }
 
-//   CLOUDINARY.uploader.destroy(public_id, (error, result) => {
-//     if (error) throw new Error(error)
-//     return next()
-//   })
-// }
+    if (image !== req.body.image) {
+      const image_id = image
+        .split("/")
+        [image.split("/").length - 1].split(".")[0];
+      promises.push(
+        new Promise((resolve, reject) => {
+          CLOUDINARY.uploader.destroy(
+            "blog_images/" + image_id,
+            (error, result) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(result);
+              }
+            }
+          );
+        })
+      );
+    }
+  } else {
+    req.body.blog_url = blog_url;
+    req.body.image = image;
+  }
 
-// module.exports = cloudinaryDestroy
+  await Promise.all(promises);
+  next();
+};
+
+module.exports = cloudinaryDestroy;

@@ -9,7 +9,6 @@ class Serializer {
         "image",
         "description",
         "blog_url",
-        "host",
         "category",
         "upload_date",
         "update_date",
@@ -24,11 +23,11 @@ class Serializer {
       typeForAttribute: () => {
         return "Blogs";
       },
-      host: {
-        ref: "_id",
-        included: true,
-        attributes: ["hostname", "base_url"],
-      },
+      // host: {
+      //   ref: "_id",
+      //   included: true,
+      //   attributes: ["hostname", "base_url"],
+      // },
     }).serialize(blogs);
   }
 }

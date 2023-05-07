@@ -1,11 +1,3 @@
-const BlogsModel = require("../models/blogs.model");
-const ApiFeatures = require("../utils/ApiFeatures");
-const buildUrl = require("../utils/BuildUrl");
-const Serializer = require("../utils/Serializer");
-
-const mongoose = require("mongoose");
-const { NotFoundError, BadRequestError } = require("../utils/ErrorMessages");
-
 const BlogServices = require("../services/blogServices");
 
 class Blogs {
@@ -19,8 +11,17 @@ class Blogs {
     });
   }
 
+  async getBlog(req, res) {
+    const blog = await BlogServices.getBlog(req);
+
+    res.status(200).json({
+      status: "Success",
+      blog,
+    });
+  }
+
   async postBlog(req, res) {
-    const blog = await BlogsModel.create(req.body);
+    const blog = await BlogServices.createBlog(req);
 
     res.status(201).json({
       status: "Success",
@@ -30,29 +31,21 @@ class Blogs {
   }
 
   async editBlog(req, res) {
-    const id = req.params.id;
-
-    if (!mongoose.isValidObjectId(id)) {
-      throw new BadRequestError(`${id} is not a valid id`);
-    }
-
-    const updatedBlog = await BlogsModel.findByIdAndUpdate(
-      id,
-      { ...req.body, update_date: Date.now() },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    if (!updatedBlog) {
-      throw new NotFoundError(`Blog ${id} is not found`);
-    }
+    const updatedBlog = await BlogServices.editBlog(req);
 
     res.status(200).json({
       status: "Success",
       message: "Updated Successfully",
       blog: updatedBlog,
+    });
+  }
+
+  async deleteBlog(req, res) {
+    await BlogServices.deleteBlog(req);
+
+    res.status(200).json({
+      status: "Success",
+      message: "Deleted Successfully",
     });
   }
 }

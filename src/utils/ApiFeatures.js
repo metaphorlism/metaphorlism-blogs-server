@@ -10,17 +10,8 @@ class ApiFeatures {
 
     excludedFields.forEach((el) => delete queryObject[el]);
 
-    if (queryObject.schedule === "" || queryObject.schedule === "All") {
-      delete queryObject.schedule;
-    }
-    if (queryObject.work_type === "" || queryObject.work_type === "All") {
-      delete queryObject.work_type;
-    }
-    if (
-      queryObject.job_category === "" ||
-      queryObject.job_category === "View All"
-    ) {
-      delete queryObject.job_category;
+    if (queryObject.category === "" || queryObject.category === "All") {
+      delete queryObject.category;
     }
 
     // 1. Search Functionality

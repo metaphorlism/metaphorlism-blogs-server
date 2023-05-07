@@ -4,16 +4,17 @@ const BlogsModel = require("../models/blogs.model");
 const ApiFeatures = require("../utils/ApiFeatures");
 const buildUrl = require("../utils/BuildUrl");
 const Serializer = require("../utils/Serializer");
+const DestroyFile = require("../utils/DestroyFile");
 
 class BlogServices {
   async getBlogs(req) {
     const blogs = new ApiFeatures(BlogsModel, req.query)
-      .filter(["host", "category"])
+      .filter(["category"])
       .sort()
       .limitFields()
       .paginate();
 
-    let docs = await blogs.model.populate("host").exec();
+    let docs = await blogs.model;
     const blogCount = await BlogsModel.countDocuments();
     const queryOptions = await blogs.model.options;
 
@@ -55,6 +56,40 @@ class BlogServices {
     docs = Serializer.blog(docs, links);
 
     return docs;
+  }
+
+  async getBlog(req) {
+    const id = req.params.id;
+
+    const blog = await BlogsModel.findById(id);
+
+    return blog;
+  }
+
+  async createBlog(req) {
+    const blog = await BlogsModel.create(req.body);
+    return blog;
+  }
+
+  async editBlog(req) {
+    const id = req.params.id;
+
+    const updatedBlog = await BlogsModel.findByIdAndUpdate(
+      id,
+      { ...req.body, update_date: Date.now() },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    return updatedBlog;
+  }
+
+  async deleteBlog(req) {
+    const id = req.params.id;
+
+    DestroyFile(id);
+    await BlogsModel.findByIdAndDelete(id);
   }
 }
 

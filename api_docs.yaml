@@ -1,0 +1,336 @@
+openapi: 3.0.0
+
+info:
+  title: Blog Metaphorlism API
+  description: API for blog server
+  contact:
+    name: Metaphorlism
+    url: https://metaphorlism.com
+  version: 1.0.0
+
+servers:
+  # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/yimsotharoth999/Scholars/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/yimsotharoth999/Camformant/1.0.0
+  - description: Camformant Server
+    url: http://localhost:8080
+
+paths:
+  /blogs:
+    get:
+      tags:
+        - Blog
+      description: Fetch Blog Data
+      # parameters:
+      #   - name: pagination
+      #     in: query
+      #     schema:
+      #       type: integer
+      #       example: 1
+      #   - name: sort
+      #     in: query
+      #     schema:
+      #       type: string
+      #       example: salary
+      #   - name: search
+      #     in: query
+      #     schema:
+      #       type: string
+      #       example: sabaicode
+
+      responses:
+        200:
+          description: Successfully Fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/blogs"
+
+    post:
+      tags:
+        - Blog
+      description: add blog
+      parameters:
+        - name: security
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/header_authorization"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/blog_requestbody"
+      responses:
+        201:
+          description: Successfully Created
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: "201"
+                  message:
+                    type: string
+                    example: "Create Successfully"
+        400:
+          description: Missing Information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+
+  /blogs/{id}:
+    get:
+      tags:
+        - Blog
+      description: Get Single Scholarship
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Successfully Fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/blog"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+
+    patch:
+      tags:
+        - Blog
+      description: update blog
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: security
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/header_authorization"
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/blog_requestbody"
+      responses:
+        200:
+          description: Successfully Updated
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: "200"
+                  message:
+                    type: string
+                    example: "Update Successfully"
+        400:
+          description: Invalid Information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+
+    delete:
+      tags:
+        - Blog
+      description: delete blog
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: security
+          in: header
+          required: true
+          schema:
+            $ref: "#/components/schemas/header_authorization"
+
+      responses:
+        204:
+          description: Successfully Deleted
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+
+components:
+  schemas:
+    blog_requestbody:
+      type: object
+      properties:
+        blog_url:
+          type: string
+          example: http://res.cloudinary.com/ds2egk1ut/raw/upload/v1683444782/blog_markdowns/w3d7i8qkxjuq4mm8eqhd.md
+        category:
+          type: string
+          example: Nodejs
+
+    blog:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        blogs:
+          type: object
+          properties:
+            id:
+              type: string
+              example: 6457542e761e68f95620389c
+            blog_url:
+              type: string
+              example: http://res.cloudinary.com/ds2egk1ut/raw/upload/v1683444782/blog_markdowns/w3d7i8qkxjuq4mm8eqhd.md
+            category:
+              type: string
+              example: NodeJS
+            upload_date:
+              type: string
+              example: 2023-05-07T07:33:02.242Z
+            update_date:
+              type: string
+              example: 2023-05-07T08:10:51.290Z
+
+    blogs:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        result:
+          type: integer
+          example: 1
+        blogs:
+          type: object
+          properties:
+            links:
+              type: object
+              properties:
+                self:
+                  type: string
+                  example: "http://localhost:80/blogs"
+                next:
+                  type: string
+                  example: "http://localhost:80/blogs?page[offset]=2"
+                last:
+                  type: string
+                  example: "http://localhost:80/blogs?page[offset]=10"
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: Blogs
+                  id:
+                    type: string
+                    example: 6457542e761e68f95620389c
+                  attributes:
+                    type: object
+                    properties:
+                      blog_url:
+                        type: string
+                        example: http://res.cloudinary.com/ds2egk1ut/raw/upload/v1683444782/blog_markdowns/w3d7i8qkxjuq4mm8eqhd.md
+                      category:
+                        type: string
+                        example: NodeJS
+                      upload_date:
+                        type: string
+                        example: 2023-05-07T07:33:02.242Z
+                      update_date:
+                        type: string
+                        example: 2023-05-07T08:10:51.290Z
+
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 404
+        message:
+          type: string
+          example: "ID is not found"
+
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 400
+        message:
+          type: string
+          example: "Invalid Information"
+
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 401
+        message:
+          type: string
+          example: "Unauthorized"
+
+    ExternalServerError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: 500
+        message:
+          type: string
+          example: "Server Error"
+
+    header_authorization:
+      type: string
+      example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ
